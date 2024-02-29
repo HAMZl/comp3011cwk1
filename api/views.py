@@ -46,10 +46,9 @@ def Stories(request):
         else:
             return HttpResponse("Service Unavailable", content_type="text/plain", status=503)
     elif request.method == "GET":
-        story_cat = request.GET.get('story_cat')
-        story_region = request.GET.get('story_region')
-        story_date = request.GET.get('story_date')
-
+        story_cat = request.GET.get('story_cat','*')
+        story_region = request.GET.get('story_region','*')
+        story_date = request.GET.get('story_date', '*')
         stories_queryset = Story.objects.all()
         if story_cat != '*':
             if story_cat in ["pol", "art", "tech", "trivia"]:
@@ -71,7 +70,7 @@ def Stories(request):
                 return HttpResponse("Invalid date parameter.", content_type="text/plain", status=503)
 
         response_data = [{'key':obj.pk, 'headline':obj.headline,'story_cat':obj.category,'story_region':obj.region, 'author': obj.author.username, 'story_date':obj.date.isoformat(),'story_details': obj.details} for obj in stories_queryset]
-        return HttpResponse({"stories": response_data}, content_type="application/json", status=status.HTTP_200_OK)
+        return JsonResponse({"stories": response_data}, status=status.HTTP_200_OK)
     else:
         return HttpResponse("Service Unavailable", content_type="text/plain", status=503)
 

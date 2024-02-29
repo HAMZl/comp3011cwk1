@@ -2,7 +2,10 @@ import requests
 import json
 
 def login(session, url):
-    url = url + "api/login"
+    if url[-1] == "/":
+        url = url + "api/login"
+    else:
+        url = url + "/api/login"
     username = input("Username: ")
     password = input("Password: ")
     data = {
@@ -20,7 +23,10 @@ def logout(session, url):
     print(response.text)
 
 def post(session, url):
-    url = url + "api/stories"
+    if url[-1] == "/":
+        url = url + "api/stories"
+    else:
+        url = url + "/api/stories"
     headline = input("Headline: ")
     category = input("Category: ")
     region = input("Region: ")
@@ -37,7 +43,7 @@ def post(session, url):
     print(response.text)
 
 def story(url, category, region, date):
-    if "" in url:
+    if "pythonanywhere" in url:
         if url[-1] == "/":
             url = url + "api/stories"
         
@@ -99,7 +105,10 @@ def list_news(session):
     
 
 def delete(session, url, pk):
-    url = url + "api/stories/" + pk
+    if url[-1] == "/":
+        url = url + "api/stories/" + pk
+    else:
+        url = url + "/api/stories/" + pk
     response = session.delete(url)
     if response.status_code == 200:
         print(response.text)
