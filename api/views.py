@@ -34,22 +34,21 @@ def Stories(request):
     if request.method == "POST":
         if request.user.is_authenticated:
             data = json.loads(request.body)
-            headline = data.get('headline') 
-            category = data.get('category') 
-            region = data.get('region') 
+            headline = data.get('headline')
+            category = data.get('category')
+            region = data.get('region')
             details = data.get('details')
             if category not in ["pol", "art", "tech", "trivia"] and region not in ["uk", "eu", "w"]:
                 return HttpResponse("Invalid category or region parameter.", content_type="text/plain", status=503)
             story = Story(headline=headline,category=category,region=region,details=details,author=request.user)
             story.save()
-            return HttpResponse("Story Posted Successfully!", content_type="text/plain", status=status.HTTP_201_CREATED) 
+            return HttpResponse("Story Posted Successfully!", content_type="text/plain", status=status.HTTP_201_CREATED)
         else:
             return HttpResponse("Service Unavailable", content_type="text/plain", status=503)
     elif request.method == "GET":
         story_cat = request.GET.get('story_cat','*')
         story_region = request.GET.get('story_region','*')
         story_date = request.GET.get('story_date', '*')
-        
         stories_queryset = Story.objects.all()
         if story_cat != '*':
             if story_cat in ["pol", "art", "tech", "trivia"]:
@@ -69,7 +68,7 @@ def Stories(request):
                 stories_queryset = stories_queryset.filter(date__gte=parsed_date)
             else:
                 return HttpResponse("Invalid date parameter.", content_type="text/plain", status=503)
-                
+
         response_data = [{'key':obj.pk, 'headline':obj.headline,'story_cat':obj.category,'story_region':obj.region, 'author': obj.author.username, 'story_date':obj.date.isoformat(),'story_details': obj.details} for obj in stories_queryset]
         return JsonResponse({"stories": response_data}, status=status.HTTP_200_OK)
     else:
