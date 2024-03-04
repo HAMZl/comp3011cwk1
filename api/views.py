@@ -76,7 +76,6 @@ def Stories(request):
         return HttpResponse("Service Unavailable", content_type="text/plain", status=503)
 
 def Delete(request, pk):
-    pass
     if request.user.is_authenticated:
         try:
             story = Story.objects.get(pk=pk, author=request.user)
