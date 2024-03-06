@@ -83,6 +83,7 @@ def Stories(request):
     else:
         return HttpResponse("Service Unavailable", content_type="text/plain", status=503)
 
+@csrf_exempt
 def Delete(request, pk):
     if request.user.is_authenticated:
         try:
