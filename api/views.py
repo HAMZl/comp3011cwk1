@@ -4,7 +4,7 @@ from django.http import HttpResponse, JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Story
+from .models import Story, Author
 from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.dateparse import parse_date
@@ -46,7 +46,8 @@ def Stories(request):
             if category not in ["pol", "art", "tech", "trivia"] and region not in ["uk", "eu", "w"]:
                 return HttpResponse("Invalid category or region parameter.", content_type="text/plain", status=503)
             # create and save an instance of story to database
-            story = Story(headline=headline,category=category,region=region,details=details,author=request.user)
+            author = Author.objects.get(user=request.user)
+            story = Story(headline=headline,category=category,region=region,details=details,author=author)
             story.save()
             return HttpResponse("Story Posted Successfully!", content_type="text/plain", status=status.HTTP_201_CREATED)
         else:
@@ -78,7 +79,7 @@ def Stories(request):
             else:
                 return HttpResponse("Invalid date parameter.", content_type="text/plain", status=503)
         # store filtered stories in an array and return as JSON abject
-        response_data = [{'key':obj.pk, 'headline':obj.headline,'story_cat':obj.category,'story_region':obj.region, 'author': obj.author.username, 'story_date':obj.date.isoformat(),'story_details': obj.details} for obj in stories_queryset]
+        response_data = [{'key':obj.pk, 'headline':obj.headline,'story_cat':obj.category,'story_region':obj.region, 'author': obj.author.name, 'story_date':obj.date.isoformat(),'story_details': obj.details} for obj in stories_queryset]
         return JsonResponse({"stories": response_data}, status=status.HTTP_200_OK)
     else:
         return HttpResponse("Service Unavailable", content_type="text/plain", status=503)
@@ -88,7 +89,8 @@ def Delete(request, pk):
     if request.user.is_authenticated:
         try:
             # get story based on primary key pk parameter and delete
-            story = Story.objects.get(pk=pk, author=request.user)
+            author = Author.objects.get(user=request.user)
+            story = Story.objects.get(pk=pk, author=author)
             story.delete()
             # return appropriate message
             return HttpResponse("Story Deleted Successfully!", content_type="text/plain", status=status.HTTP_200_OK)
