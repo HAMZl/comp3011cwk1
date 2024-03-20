@@ -57,6 +57,10 @@ def Stories(request):
         story_cat = request.GET.get('story_cat','*')
         story_region = request.GET.get('story_region','*')
         story_date = request.GET.get('story_date', '*')
+        
+        if "/" in story_date:
+            story_date = story_date.split("/")[::-1]
+            story_date = "-".join(story_date)
         # get ALL stories
         stories_queryset = Story.objects.all()
         # validate parameters and filter stories accordingly
